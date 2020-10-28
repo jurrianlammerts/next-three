@@ -105,12 +105,11 @@ export default function Home() {
         <Scene />
       </Canvas>
       <a
-        href="https://github.com/jurrianlammerts"
+        href="https://github.com/jurrianlammerts/next-three"
         className="top-left"
         children="Github"
       />
-      <a href="https://twitter.com/" className="top-right" children="Twitter" />
-      <span className="header">Portfolio</span>
+      <span className="header">No strings attached</span>
     </div>
   );
 }
