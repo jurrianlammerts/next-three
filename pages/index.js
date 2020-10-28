@@ -6,11 +6,14 @@ import React, { useState, useRef } from 'react';
 import { extend, Canvas, useFrame } from 'react-three-fiber';
 import * as meshline from 'three.meshline';
 
+import Logo from '../components/icons/Logo';
+import Github from '../components/icons/Github';
+
 extend(meshline);
 
 const numLines = 100;
 const lines = new Array(numLines).fill();
-const colors = ['#A2CCB6', '#FCEEB5', '#EE786E', '#EE786E'];
+const colors = ['#CC7E00', '#D2BF94', '#E2B147', '#BD3B1F'];
 
 function Fatline() {
   const material = useRef();
@@ -99,17 +102,23 @@ export default function Home() {
         />
       </Head>
       <Canvas
-        style={{ background: '#324444' }}
+        style={{ background: '#F5E9CD' }}
         camera={{ position: [0, 50, 10], fov: 75 }}
       >
         <Scene />
       </Canvas>
+      <a href="/" className="logo top-left">
+        <Logo />
+      </a>
       <a
         href="https://github.com/jurrianlammerts/next-three"
-        className="top-left"
-        children="Github"
-      />
-      <span className="header">No strings attached</span>
+        className="logo top-right"
+      >
+        <Github/>
+      </a>
+      <span className="header">
+        Fall vibes.
+      </span>
     </div>
   );
 }
