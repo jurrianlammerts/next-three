@@ -1,65 +1,116 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from 'next/head';
+
+import ReactDOM from 'react-dom';
+import * as THREE from 'three';
+import React, { useState, useRef } from 'react';
+import { extend, Canvas, useFrame } from 'react-three-fiber';
+import * as meshline from 'three.meshline';
+
+extend(meshline);
+
+const numLines = 100;
+const lines = new Array(numLines).fill();
+const colors = ['#A2CCB6', '#FCEEB5', '#EE786E', '#EE786E'];
+
+function Fatline() {
+  const material = useRef();
+  const [color] = useState(
+    () => colors[parseInt(colors.length * Math.random())],
+  );
+  const [ratio] = useState(() => 0.5 + 0.5 * Math.random());
+  const [width] = useState(() => Math.max(0.1, 0.3 * Math.random()));
+  // Calculate wiggly curve
+  const [curve] = useState(() => {
+    let pos = new THREE.Vector3(
+      30 - 60 * Math.random(),
+      -5,
+      10 - 20 * Math.random(),
+    );
+    return new Array(30)
+      .fill()
+      .map(() =>
+        pos
+          .add(
+            new THREE.Vector3(
+              2 - Math.random() * 4,
+              4 - Math.random() * 2,
+              5 - Math.random() * 10,
+            ),
+          )
+          .clone(),
+      );
+  });
+  // Hook into the render loop and decrease the materials dash-offset
+  useFrame(() => (material.current.uniforms.dashOffset.value -= 0.0005));
+  return (
+    <mesh>
+      {/** MeshLine and CMRCurve are a OOP factories, not scene objects, hence all the imperative code in here :-( */}
+      <meshLine onUpdate={(self) => (self.parent.geometry = self.geometry)}>
+        <geometry onUpdate={(self) => self.parent.setGeometry(self)}>
+          <catmullRomCurve3
+            args={[curve]}
+            onUpdate={(self) => (self.parent.vertices = self.getPoints(500))}
+          />
+        </geometry>
+      </meshLine>
+      {/** MeshLineMaterial on the other hand is a regular material, so we can just attach it */}
+      <meshLineMaterial
+        attach="material"
+        ref={material}
+        transparent
+        depthTest={false}
+        lineWidth={width}
+        color={color}
+        dashArray={0.1}
+        dashRatio={ratio}
+      />
+    </mesh>
+  );
+}
+
+function Scene() {
+  let group = useRef();
+  let theta = 0;
+  // Hook into the render loop and rotate the scene a bit
+  useFrame(() =>
+    group.current.rotation.set(
+      0,
+      5 * Math.sin(THREE.Math.degToRad((theta += 0.02))),
+      0,
+    ),
+  );
+  return (
+    <group ref={group}>
+      {lines.map((_, index) => (
+        <Fatline key={index} />
+      ))}
+    </group>
+  );
+}
 
 export default function Home() {
   return (
-    <div className={styles.container}>
+    <div className="main">
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Next.js | Three.js</title>
+        <link
+          href="https://fonts.googleapis.com/css?family=Playfair+Display:700"
+          rel="stylesheet"
+        />
       </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+      <Canvas
+        style={{ background: '#324444' }}
+        camera={{ position: [0, 50, 10], fov: 75 }}
+      >
+        <Scene />
+      </Canvas>
+      <a
+        href="https://github.com/jurrianlammerts"
+        className="top-left"
+        children="Github"
+      />
+      <a href="https://twitter.com/" className="top-right" children="Twitter" />
+      <span className="header">Portfolio</span>
     </div>
-  )
+  );
 }
