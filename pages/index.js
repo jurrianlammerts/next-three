@@ -151,10 +151,15 @@ export default function Home() {
       >
         <Github />
       </a>
-      <div className="bottom-left inactiveLink">{!loaded && <Spinner />}</div>
+
       <a className="header" onClick={() => getRandomColors()}>
         random vibes.
       </a>
+      {!loaded && (
+        <div className="spinner bottom-left">
+          <Spinner />
+        </div>
+      )}
     </div>
   );
 }

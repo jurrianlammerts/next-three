@@ -90,6 +90,11 @@ a:hover {
   right: 50px;
 }
 
+.bottom-left {
+  bottom: 50px;
+  left: 50px;
+}
+
 @media only screen and (max-width: 750px) {
   .top-left {
     top: 50px;
@@ -99,6 +104,11 @@ a:hover {
   .top-right {
     top: 50px;
     right: 24px;
+  }
+
+  .bottom-left {
+    bottom: 50px;
+    left: 24px;
   }
 }
 
@@ -138,6 +148,10 @@ canvas {
   }
 }
 
+.spinner {
+  position: absolute;
+}
+
 .scroll-container {
   position: absolute;
   overflow: auto;
@@ -147,9 +161,4 @@ canvas {
   font-size: 20em;
   font-weight: 800;
   line-height: 0.9em;
-}
-
-.inactiveLink {
-  pointer-events: none;
-  cursor: default;
 }
