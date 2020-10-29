@@ -144,6 +144,8 @@ export default function Home() {
         <Logo />
       </a>
       <a
+        target="_blank"
+        rel="noopener"
         href="https://github.com/jurrianlammerts/next-three"
         className="logo top-right"
       >
