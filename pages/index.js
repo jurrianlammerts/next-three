@@ -19,11 +19,10 @@ const lines = new Array(numLines).fill();
 
 function Fatline({ randomColors }) {
   const material = useRef();
-  const [color, setColor] = useState(
-    () => randomColors[parseInt(randomColors.length * Math.random())],
-  );
   const [ratio] = useState(() => 0.5 + 0.5 * Math.random());
-  const [width] = useState(() => Math.max(0.1, 0.3 * Math.random()));
+  const [width] = useState(() => Math.max(0.1, 0.5 * Math.random()));
+  const color = randomColors[parseInt(randomColors.length * Math.random())];
+
   // Calculate wiggly curve
   const [curve] = useState(() => {
     let pos = new THREE.Vector3(
@@ -45,16 +44,11 @@ function Fatline({ randomColors }) {
           .clone(),
       );
   });
-  // Hook into the render loop and decrease the materials dash-offset
-  useFrame(() => (material.current.uniforms.dashOffset.value -= 0.0005));
 
-  useEffect(() => {
-    setColor(() => randomColors[parseInt(randomColors.length * Math.random())]);
-  }, [randomColors]);
+  useFrame(() => (material.current.uniforms.dashOffset.value -= 0.001));
 
   return (
     <mesh>
-      {/** MeshLine and CMRCurve are a OOP factories, not scene objects, hence all the imperative code in here :-( */}
       <meshLine onUpdate={(self) => (self.parent.geometry = self.geometry)}>
         <geometry onUpdate={(self) => self.parent.setGeometry(self)}>
           <catmullRomCurve3
@@ -63,14 +57,13 @@ function Fatline({ randomColors }) {
           />
         </geometry>
       </meshLine>
-      {/** MeshLineMaterial on the other hand is a regular material, so we can just attach it */}
       <meshLineMaterial
         attach="material"
         ref={material}
         transparent
         depthTest={false}
         lineWidth={width}
-        color={color}
+        color={randomColors[parseInt(randomColors.length * Math.random())]}
         dashArray={0.1}
         dashRatio={ratio}
       />
@@ -81,14 +74,16 @@ function Fatline({ randomColors }) {
 function Scene({ randomColors }) {
   let group = useRef();
   let theta = 0;
+
   // Hook into the render loop and rotate the scene a bit
   useFrame(() =>
     group.current.rotation.set(
       0,
-      5 * Math.sin(THREE.Math.degToRad((theta += 0.02))),
+      5 * Math.sin(THREE.Math.degToRad((theta += 0.03))),
       0,
     ),
   );
+
   return (
     <group ref={group}>
       {lines.map((_, index) => (
@@ -99,20 +94,18 @@ function Scene({ randomColors }) {
 }
 
 export default function Home() {
-  const initialColors = ['#3f736b', '#479693', '#3eb5be', '#9ad8ff', '#f6f6ff'];
   const randomColor = (0x1000000 + Math.random() * 0xffffff)
     .toString(16)
     .substr(1, 6);
 
   const [background, setBackground] = useState('#' + randomColor);
-  const [randomColors, setRandomColors] = useState(initialColors);
+  const [randomColors, setRandomColors] = useState(null);
   const [loaded, setLoaded] = useState(true);
 
   const getRandomColors = async () => {
     setLoaded(false);
-    const randomColor = (0x1000000 + Math.random() * 0xffffff)
-      .toString(16)
-      .substr(1, 6);
+
+    // Proxy to add CORS header to request
     const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
     const apiUrl = `http://palett.es/API/v1/palette/from/${randomColor}`;
 
@@ -122,8 +115,13 @@ export default function Home() {
         setRandomColors(data);
         setBackground('#' + randomColor);
       });
+
     setLoaded(true);
   };
+
+  useEffect(() => {
+    getRandomColors();
+  }, []);
 
   return (
     <div className="main">
@@ -138,7 +136,7 @@ export default function Home() {
         style={{ background }}
         camera={{ position: [0, 50, 10], fov: 75 }}
       >
-        <Scene randomColors={randomColors} />
+        {randomColors && <Scene randomColors={randomColors} />}
       </Canvas>
       <a href="/" className="logo top-left">
         <Logo />
@@ -155,6 +153,7 @@ export default function Home() {
       <a className="header" onClick={() => getRandomColors()}>
         random vibes.
       </a>
+
       {!loaded && (
         <div className="spinner bottom-left">
           <Spinner />
