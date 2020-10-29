@@ -2,23 +2,23 @@ import Head from 'next/head';
 
 import ReactDOM from 'react-dom';
 import * as THREE from 'three';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { extend, Canvas, useFrame } from 'react-three-fiber';
 import * as meshline from 'three.meshline';
 
 import Logo from '../components/icons/Logo';
 import Github from '../components/icons/Github';
+import Random from '../components/icons/Random';
 
 extend(meshline);
 
 const numLines = 100;
 const lines = new Array(numLines).fill();
-const colors = ['#CC7E00', '#D2BF94', '#E2B147', '#BD3B1F'];
 
-function Fatline() {
+function Fatline({ randomColors }) {
   const material = useRef();
-  const [color] = useState(
-    () => colors[parseInt(colors.length * Math.random())],
+  const [color, setColor] = useState(
+    () => randomColors[parseInt(randomColors.length * Math.random())],
   );
   const [ratio] = useState(() => 0.5 + 0.5 * Math.random());
   const [width] = useState(() => Math.max(0.1, 0.3 * Math.random()));
@@ -45,6 +45,11 @@ function Fatline() {
   });
   // Hook into the render loop and decrease the materials dash-offset
   useFrame(() => (material.current.uniforms.dashOffset.value -= 0.0005));
+
+  useEffect(() => {
+    setColor(() => randomColors[parseInt(randomColors.length * Math.random())]);
+  }, [randomColors]);
+
   return (
     <mesh>
       {/** MeshLine and CMRCurve are a OOP factories, not scene objects, hence all the imperative code in here :-( */}
@@ -71,7 +76,7 @@ function Fatline() {
   );
 }
 
-function Scene() {
+function Scene({ randomColors }) {
   let group = useRef();
   let theta = 0;
   // Hook into the render loop and rotate the scene a bit
@@ -85,27 +90,45 @@ function Scene() {
   return (
     <group ref={group}>
       {lines.map((_, index) => (
-        <Fatline key={index} />
+        <Fatline key={index} randomColors={randomColors} />
       ))}
     </group>
   );
 }
 
 export default function Home() {
+  const initialColors = ['#3f736b', '#479693', '#3eb5be', '#9ad8ff', '#f6f6ff'];
+  const randomColor = (0x1000000 + Math.random() * 0xffffff)
+    .toString(16)
+    .substr(1, 6);
+  const [background, setBackground] = useState('#' + randomColor);
+  const [randomColors, setRandomColors] = useState(initialColors);
+
+  const getRandomColors = async () => {
+    // Proxy server that adds CORS header to the request
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    const apiUrl = `http://palett.es/API/v1/palette/from/${randomColor}`;
+    const response = await fetch(proxyUrl + apiUrl);
+    const data = await response.json();
+
+    setBackground('#' + randomColor);
+    setRandomColors(data);
+  };
+
   return (
     <div className="main">
       <Head>
-        <title>Next.js | Three.js</title>
+        <title>Random vibes.</title>
         <link
           href="https://fonts.googleapis.com/css?family=Playfair+Display:700"
           rel="stylesheet"
         />
       </Head>
       <Canvas
-        style={{ background: '#F5E9CD' }}
+        style={{ background }}
         camera={{ position: [0, 50, 10], fov: 75 }}
       >
-        <Scene />
+        <Scene randomColors={randomColors} />
       </Canvas>
       <a href="/" className="logo top-left">
         <Logo />
@@ -114,11 +137,12 @@ export default function Home() {
         href="https://github.com/jurrianlammerts/next-three"
         className="logo top-right"
       >
-        <Github/>
+        <Github />
       </a>
-      <span className="header">
-        Fall vibes.
-      </span>
+      <a onClick={() => getRandomColors()} className="logo bottom-left">
+        <Random />
+      </a>
+      <span className="header">random vibes.</span>
     </div>
   );
 }

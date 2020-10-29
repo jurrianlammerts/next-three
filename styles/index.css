@@ -41,6 +41,8 @@ body {
 
 span.header {
   font-family: 'Playfair Display', serif;
+  mix-blend-mode: overlay;
+  text-transform: capitalize;
   text-align: left;
   position: absolute;
   display: inline-block;
@@ -57,7 +59,7 @@ span.header {
     top: 50%;
     left: 50%;
     transform: translate3d(-50%, -50%, 0);
-    font-size: 6em;
+    font-size: 5em;
     width: 100%;
     text-align: center;
   }
@@ -74,6 +76,7 @@ a {
   font-size: 1.1em;
   display: inline;
   text-decoration: none;
+  cursor: pointer;
 }
 
 a:hover {
