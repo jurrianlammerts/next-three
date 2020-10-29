@@ -4,11 +4,13 @@ import ReactDOM from 'react-dom';
 import * as THREE from 'three';
 import React, { useState, useRef, useEffect } from 'react';
 import { extend, Canvas, useFrame } from 'react-three-fiber';
+import { useQuery } from 'react-query';
 import * as meshline from 'three.meshline';
 
 import Logo from '../components/icons/Logo';
 import Github from '../components/icons/Github';
 import Random from '../components/icons/Random';
+import Spinner from '@components/icons/Spinner';
 
 extend(meshline);
 
@@ -101,18 +103,26 @@ export default function Home() {
   const randomColor = (0x1000000 + Math.random() * 0xffffff)
     .toString(16)
     .substr(1, 6);
+
   const [background, setBackground] = useState('#' + randomColor);
   const [randomColors, setRandomColors] = useState(initialColors);
+  const [loaded, setLoaded] = useState(true);
 
   const getRandomColors = async () => {
-    // Proxy server that adds CORS header to the request
+    setLoaded(false);
+    const randomColor = (0x1000000 + Math.random() * 0xffffff)
+      .toString(16)
+      .substr(1, 6);
     const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
     const apiUrl = `http://palett.es/API/v1/palette/from/${randomColor}`;
-    const response = await fetch(proxyUrl + apiUrl);
-    const data = await response.json();
 
-    setBackground('#' + randomColor);
-    setRandomColors(data);
+    await fetch(proxyUrl + apiUrl)
+      .then((res) => res.json())
+      .then((data) => {
+        setRandomColors(data);
+        setBackground('#' + randomColor);
+      });
+    setLoaded(true);
   };
 
   return (
@@ -139,8 +149,11 @@ export default function Home() {
       >
         <Github />
       </a>
-      <a onClick={() => getRandomColors()} className="logo bottom-left">
-        <Random />
+      <a
+        onClick={() => getRandomColors()}
+        className={`logo bottom-left ${!loaded && 'inactiveLink'}`}
+      >
+        {!loaded ? <Spinner /> : <Random />}
       </a>
       <span className="header">random vibes.</span>
     </div>

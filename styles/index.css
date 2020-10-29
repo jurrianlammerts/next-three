@@ -149,3 +149,8 @@ canvas {
   font-weight: 800;
   line-height: 0.9em;
 }
+
+.inactiveLink {
+  pointer-events: none;
+  cursor: default;
+}
