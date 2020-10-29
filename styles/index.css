@@ -63,9 +63,6 @@ span.header {
     width: 100%;
     text-align: center;
   }
-  a.bottom-left {
-    display: none;
-  }
 }
 
 a {
