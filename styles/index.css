@@ -95,6 +95,11 @@ a:hover {
   left: 50px;
 }
 
+.bottom-right {
+  bottom: 50px;
+  right: 50px;
+}
+
 @media only screen and (max-width: 750px) {
   .top-left {
     top: 50px;
@@ -109,6 +114,11 @@ a:hover {
   .bottom-left {
     bottom: 50px;
     left: 24px;
+  }
+
+  .bottom-right {
+    bottom: 50px;
+    right: 24px;
   }
 }
 
@@ -148,7 +158,7 @@ canvas {
   }
 }
 
-.spinner {
+.icon {
   position: absolute;
 }
 

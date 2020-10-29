@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 
 import ReactDOM from 'react-dom';
 import * as THREE from 'three';
@@ -7,10 +8,11 @@ import { extend, Canvas, useFrame } from 'react-three-fiber';
 import { useQuery } from 'react-query';
 import * as meshline from 'three.meshline';
 
-import Logo from '../components/icons/Logo';
-import Github from '../components/icons/Github';
-import Random from '../components/icons/Random';
+import Logo from '@components/icons/Logo';
+import Github from '@components/icons/Github';
+import Random from '@components/icons/Random';
 import Spinner from '@components/icons/Spinner';
+import Arrow from '@components/icons/Arrow';
 
 extend(meshline);
 
@@ -153,10 +155,16 @@ export default function Home() {
       </a>
 
       {!loaded && (
-        <div className="spinner bottom-left">
+        <div className="icon bottom-left">
           <Spinner />
         </div>
       )}
+
+      <Link href="/bubbles">
+        <a className="logo bottom-right">
+          <Arrow />
+        </a>
+      </Link>
     </div>
   );
 }
