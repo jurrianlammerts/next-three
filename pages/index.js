@@ -94,9 +94,7 @@ function Scene({ randomColors }) {
 }
 
 export default function Home() {
-  const randomColor = (0x1000000 + Math.random() * 0xffffff)
-    .toString(16)
-    .substr(1, 6);
+  const randomColor = Math.floor(Math.random() * 16777215).toString(16);
 
   const [background, setBackground] = useState('#' + randomColor);
   const [randomColors, setRandomColors] = useState(null);
