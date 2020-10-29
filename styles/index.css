@@ -39,7 +39,7 @@ body {
   overflow: hidden;
 }
 
-span.header {
+.header {
   font-family: 'Playfair Display', serif;
   mix-blend-mode: overlay;
   text-transform: capitalize;
@@ -55,7 +55,7 @@ span.header {
 }
 
 @media only screen and (max-width: 750px) {
-  span.header {
+  .header {
     top: 50%;
     left: 50%;
     transform: translate3d(-50%, -50%, 0);
@@ -80,24 +80,26 @@ a:hover {
   text-decoration: underline;
 }
 
-a.top-left {
+.top-left {
   top: 50px;
   left: 50px;
 }
 
-a.top-right {
+.top-right {
   top: 50px;
   right: 50px;
 }
 
-a.bottom-left {
-  bottom: 50px;
-  left: 50px;
-}
+@media only screen and (max-width: 750px) {
+  .top-left {
+    top: 50px;
+    left: 24px;
+  }
 
-a.bottom-right {
-  bottom: 50px;
-  right: 50px;
+  .top-right {
+    top: 50px;
+    right: 24px;
+  }
 }
 
 a.logo {
